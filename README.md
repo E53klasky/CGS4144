@@ -1,1 +1,1 @@
-Introducton to Bioinformaticsi with Ethan, Tim, and Amit 
+Introducton to Bioinformatics with Ethan, Tim, and Amit 
