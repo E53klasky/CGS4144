@@ -5,5 +5,7 @@ __pycache__/
 #venv
 venv
 
+# 
+*.csv
 # data dir 
 SRP092402
