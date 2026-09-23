@@ -21,7 +21,7 @@ def main():
 
     print("Expression shape (genes x samples):", expression.shape)
 
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = "cuda" if torch.cuda.is_available() else "cpu"
 
     X = torch.tensor(expression.values, dtype=torch.float32, device=device)
     X = torch.log2(X + 1)
@@ -40,8 +40,8 @@ def main():
     tb_mask = disease == "tb subjects"
     healthy_mask = disease == "healthy controls"
 
-    plt.xlabel('t-SNE 1')
-    plt.ylabel('t-SNE 2')
+    plt.xlabel("t-SNE 1")
+    plt.ylabel("t-SNE 2")
 
     plt.scatter(
         X_tsne[tb_mask, 0],
@@ -56,7 +56,7 @@ def main():
         label="Healthy Controls",
         alpha=0.7,
     )
-    
+
     plt.title("t-SNE plot of SRP092402 RNA-seq Expression")
     plt.legend()
 
