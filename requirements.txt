@@ -5,4 +5,7 @@ numpy
 scipy
 statsmodels
 PyComplexHeatmap
+mygene
 scikit-learn
+umap-learn
+gprofiler-official

@@ -186,11 +186,10 @@ def make_volcano_plot(results):
 
 def make_heatmap(expression, metadata, results):
 
-    # Top 50 significant genes
     significant_genes = results.loc[
         results["significant"],
         "gene",
-    ].head(50)
+    ]
 
     heatmap_data = expression.loc[significant_genes]
 
