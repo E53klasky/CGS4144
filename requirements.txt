@@ -5,3 +5,4 @@ numpy
 scipy
 statsmodels
 PyComplexHeatmap
+scikit-learn
