@@ -12,11 +12,7 @@ def main():
     metadata = metadata[metadata["refinebio_disease"].isin(groups)].copy()
 
     metadata = metadata.set_index("refinebio_accession_code")
-    sample_ids = [
-        sample
-        for sample in expression.columns
-        if sample in metadata.index
-    ]
+    sample_ids = [sample for sample in expression.columns if sample in metadata.index]
 
     expression = expression[sample_ids]
     metadata = metadata.loc[sample_ids]
@@ -26,7 +22,7 @@ def main():
 
     print("Expression shape (genes x samples):", expression.shape)
 
-    device = "cpu" 
+    device = "cpu"
 
     X = torch.tensor(
         expression.values,
@@ -84,7 +80,6 @@ def main():
         "figs/UMAP.png",
         dpi=300,
     )
-
 
 
 if __name__ == "__main__":

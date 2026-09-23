@@ -41,13 +41,7 @@ def convert_ensembl_to_gene_names(expression):
 
     mg = mygene.MyGeneInfo()
 
-    ensembl_ids = (
-        expression.index
-        .astype(str)
-        .str.split(".")
-        .str[0]
-        .tolist()
-    )
+    ensembl_ids = expression.index.astype(str).str.split(".").str[0].tolist()
 
     results = mg.querymany(
         ensembl_ids,
@@ -62,10 +56,7 @@ def convert_ensembl_to_gene_names(expression):
         if "symbol" in result:
             mapping[result["query"]] = result["symbol"]
 
-    gene_names = [
-        mapping.get(gene_id, gene_id)
-        for gene_id in ensembl_ids
-    ]
+    gene_names = [mapping.get(gene_id, gene_id) for gene_id in ensembl_ids]
 
     converted = expression.copy()
     converted.index = gene_names
@@ -141,10 +132,7 @@ def main():
     print("\nMetadata columns:")
     print(metadata.columns.tolist())
 
-
-    expression_gene_names = convert_ensembl_to_gene_names(
-        expression
-    )
+    expression_gene_names = convert_ensembl_to_gene_names(expression)
 
     print("\nExpression matrix with gene names:")
     print(expression_gene_names.iloc[:5, :5])

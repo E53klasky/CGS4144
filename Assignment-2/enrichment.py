@@ -8,15 +8,12 @@ def main():
 
     Path("results").mkdir(exist_ok=True)
 
-
     de_file = Path("results/differential_expression_all.csv")
 
     results = pd.read_csv(de_file)
 
     # Use statistically significant differentially expressed genes
-    significant = results[
-        results["adjusted_p_value"] < 0.05
-    ].copy()
+    significant = results[results["adjusted_p_value"] < 0.05].copy()
 
     print("Significant DE genes:", len(significant))
 
@@ -34,7 +31,6 @@ def main():
 
     print("Unique genes submitted:", len(genes))
 
-
     gp = GProfiler(
         return_dataframe=True,
     )
@@ -42,20 +38,14 @@ def main():
     enrichment = gp.profile(
         organism="hsapiens",
         query=genes,
-
         sources=["GO:BP"],
-
         significance_threshold_method="fdr",
-
         user_threshold=0.05,
     )
 
     print("Significantly enriched GO terms:", len(enrichment))
 
-
-    output_file = Path(
-        "results/enrichment_gprofiler_GO_BP.csv"
-    )
+    output_file = Path("results/enrichment_gprofiler_GO_BP.csv")
 
     enrichment.to_csv(
         output_file,
@@ -81,10 +71,7 @@ def main():
 
         print("\nTop 10 enriched terms:")
         print(
-            enrichment[columns]
-            .sort_values("p_value")
-            .head(10)
-            .to_string(index=False)
+            enrichment[columns].sort_values("p_value").head(10).to_string(index=False)
         )
 
     else:
