@@ -12,18 +12,15 @@
 \usepackage{xcolor}
 \usepackage{parskip}
 \usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{booktabs}
 \usepackage{csvsimple}
+\usepackage{siunitx}
 
 \graphicspath{ {../figs} }
 
 \titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
 \titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{1em}{}
-
-\newcommand{\placeholder}[1]{%
-	\begin{center}
-		\fbox{\parbox{0.9\textwidth}{\centering\itshape #1}}
-	\end{center}
-}
 
 \title{\vspace{-1.5cm}CGS4144 Bioinformatics --- Assignment 2}
 \author{}
@@ -70,7 +67,7 @@
 	
 	\section{Dimensionality Reduction: PCA, t-SNE, and UMAP}
 	
-	PCA, t-SNE, and UMAP were used to visualize differences in gene expression between TB subjects and healthy controls. For the PCA plot, the expression data were $\log_2$-transformed and mean-centered prior to decomposition via SVD. PC1 and PC2 explained 7.3\% and 4.6\% of the total variance, respectively, and the two groups largely overlapped rather than forming distinct clusters. For the t-SNE plot, a perplexity of 20 was used; the plot also showed substantial overlap between groups, although some healthy-control samples formed small local groups. For the UMAP plot, 15 neighbors were used; UMAP showed the clearest local grouping of healthy controls, particularly on one side of the plot, but healthy and TB samples were still not completely separated.
+	PCA, t-SNE, and UMAP were used to visualize differences in gene expression between TB subjects and healthy controls. For the PCA plot, the expression data were $\log_2$-transformed and mean-centered prior to decomposition via SVD. PC1 and PC2 explained 7.3\% and 4.6\% of the total variance, respectively, and the two groups largely overlapped rather than forming distinct clusters. For the t-SNE plot, a perplexity of 20 was used. The plot also showed substantial overlap between groups, although some healthy-control samples formed small local groups. For the UMAP plot, 15 neighbors were usedT The UMAP plot showed the clearest local grouping of healthy controls, particularly on one side of the plot, but healthy and TB samples were still not completely separated.
 	
 	\begin{figure}[h]
 		\centering
@@ -106,11 +103,34 @@
 	
 	The table below lists the top 50 differentially expressed genes, including their log2 fold change, group means, $p$-value, adjusted $p$-value, and significance status. All 50 of the top differentially expressed genes were found to be significant.
 	
-	\begin{center}
-		% TODO: insert table from results/top_50_differential_genes.csv
-		\placeholder{[Table: Top 50 Differentially Expressed Genes --- results/top\_50\_differential\_genes.csv]}
-	
-	\end{center}
+	% NOTE: reads ../results/top_50_differential_genes.csv directly at
+	% compile time (path relative to this submission/ directory, matching
+	% \graphicspath{{../figs}} above). Adjust the path if your layout differs.
+	\begingroup
+	\footnotesize
+	\begin{longtable}{@{}l
+			S[table-format=-1.4, round-mode=places, round-precision=3]
+			S[scientific-notation=true, round-mode=figures, round-precision=2]@{}}
+		\caption{Top 50 differentially expressed genes, ranked by adjusted $p$-value. All 50 genes shown are significant (adjusted $p < 0.05$).}
+		\label{tab:top50}\\
+		\toprule
+		\textbf{Gene} & {\textbf{log$_2$ FC}} & {\textbf{Adj. $p$-value}} \\
+		\midrule
+		\endfirsthead
+		\multicolumn{3}{l}{\small\itshape (continued from previous page)}\\
+		\toprule
+		\textbf{Gene} & {\textbf{log$_2$ FC}} & {\textbf{Adj. $p$-value}} \\
+		\midrule
+		\endhead
+		\midrule
+		\multicolumn{3}{r}{\small\itshape continued on next page}\\
+		\endfoot
+		\bottomrule
+		\endlastfoot
+		\csvreader[]{../results/top_50_differential_genes.csv}{}%
+		{\csvcoli & \csvcoliv & \csvcolvi \\}
+	\end{longtable}
+	\endgroup
 	
 	\section{Heatmap of Significantly Differentially Expressed Genes}
 	
@@ -127,37 +147,31 @@
 	
 	Three enrichment methods were run across the team: clusterProfiler, gProfiler2, and the Wilcoxon rank-sum test. For clusterProfiler and gProfiler2, the significant gene list was defined using an adjusted $p$-value threshold of 0.05 combined with a $|\log_2 \text{FC}| \geq 0.3$ cutoff. Across these methods, results consistently pointed to genes with immune-related roles, including terms such as ``response to bacterium'' and ``regulation of innate immune response.''
 	
-	\subsection{clusterProfiler (GO: Biological Process)}
-	
-	% TODO: insert table from results/GO_BP_filtered_enrichment_clusterProfiler.csv
-	\placeholder{[Table: clusterProfiler GO:BP enrichment results --- results/GO\_BP\_filtered\_enrichment\_clusterProfiler.csv]}
-	
-	\subsection{gProfiler2 (GO: Biological Process)}
-	
-	% TODO: insert table from results/filtered_enrichment_gprofiler_GO_BP.csv
-	\placeholder{[Table: gProfiler2 GO:BP enrichment results --- results/filtered\_enrichment\_gprofiler\_GO\_BP.csv]}
-	
-	\subsection{Wilcoxon Rank-Sum Test}
-	
-	% TODO: insert table from results/rank_sum.csv
-	\placeholder{[Table: Wilcoxon rank-sum enrichment results --- results/rank\_sum.csv]}
-	
 	\section{Joint Enrichment Table Across Methods}
 	
 	The results from the three enrichment methods were combined into a single joint table, with one row per unique GO term and columns indicating, for each method, whether the term was tested and whether it was found significant. Two summary columns record the number of methods that tested each term and the number of methods that found it significant. Of the terms tested, 24 genes/terms were found significant by all three methods, indicating a substantial degree of agreement across methods regarding genes with a significant impact on expression.
-	
-	\begin{center}
-		% TODO: insert table from results/combined_enrichment.csv
-		\placeholder{[Table: Combined Enrichment Results Across Methods --- results/combined\_enrichment.csv]}
-	\end{center}
 	
 	\section{Top 10 Terms Enriched Across Methods}
 	
 	Using the joint table from Section 6, the top 10 terms most consistently enriched across the three methods were identified. This table shows a substantial number of terms that are enriched across all methods used in the analysis.
 	
 	\begin{center}
-		% TODO: insert table from results/top_10_combined_enrichment.csv
-		\placeholder{[Table: Top 10 Terms Enriched Across All Methods --- results/top\_10\_combined\_enrichment.csv]}
+		\begin{tabular}{|c|c|c|c|c|c|}
+			\hline
+			go\_term & p\_value\_rank\_sum & p\_value\_gprofiler & p\_value\_clusterprofiler & methods & significant\_methods \\
+			\hline
+			GO:0001818 & $4.0 \times 10^{-2}$ & $8.7 \times 10^{-5}$ & $5.7 \times 10^{-4}$ & 3 & 3 \\
+			GO:0002221 & $4.1 \times 10^{-3}$ & $1.0 \times 10^{-10}$ & $3.0 \times 10^{-7}$ & 3 & 3 \\
+			GO:0002227 & $1.1 \times 10^{-7}$ & $1.1 \times 10^{-2}$ & $1.9 \times 10^{-6}$ & 3 & 3 \\
+			GO:0006935 & $4.4 \times 10^{-4}$ & $1.0 \times 10^{-3}$ & $4.8 \times 10^{-4}$ & 3 & 3 \\
+			GO:0009615 & $4.8 \times 10^{-5}$ & $2.2 \times 10^{-10}$ & $5.0 \times 10^{-16}$ & 3 & 3 \\
+			GO:0030183 & $8.0 \times 10^{-4}$ & $5.6 \times 10^{-7}$ & $7.8 \times 10^{-4}$ & 3 & 3 \\
+			GO:0032481 & $4.0 \times 10^{-2}$ & $6.1 \times 10^{-3}$ & $1.5 \times 10^{-4}$ & 3 & 3 \\
+			GO:0032760 & $6.3 \times 10^{-13}$ & $7.6 \times 10^{-3}$ & $8.5 \times 10^{-5}$ & 3 & 3 \\
+			GO:0034341 & $5.4 \times 10^{-10}$ & $1.2 \times 10^{-2}$ & $4.4 \times 10^{-7}$ & 3 & 3 \\
+			GO:0035456 & $1.1 \times 10^{-5}$ & $3.7 \times 10^{-2}$ & $5.4 \times 10^{-8}$ & 3 & 3 \\
+			\hline
+		\end{tabular}
 	\end{center}
 	
 \end{document}
