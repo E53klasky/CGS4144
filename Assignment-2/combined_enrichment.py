@@ -25,3 +25,7 @@ combined_results["significant_methods"] = ((combined_results["p_value_rank_sum"]
 combined_results = combined_results.sort_values(["methods", "significant_methods"], ascending=False)
 
 combined_results.to_csv("Assignment-2/results/combined_enrichment.csv", index=False)
+
+
+combined_top10 = pd.read_csv("Assignment-2/results/combined_enrichment.csv").head(10)
+combined_top10.to_csv("Assignment-2/results/top_10_combined_enrichment.csv", index=False)
