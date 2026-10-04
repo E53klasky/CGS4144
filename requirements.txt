@@ -9,3 +9,4 @@ mygene
 scikit-learn
 umap-learn
 gprofiler-official
+seaborn
