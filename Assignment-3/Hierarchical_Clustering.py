@@ -5,15 +5,79 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 import matplotlib.pyplot as plt
+import itertools
 
 from sklearn.preprocessing import StandardScaler
 from scipy.cluster.hierarchy import dendrogram, linkage
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics import silhouette_score
+from scipy.stats import chi2_contingency
 
 from sklearn.decomposition import PCA
 
 gene_count = 5000
+
+
+def chi_square_clustering_comparison(labels1, labels2):
+    # Compare two clustering results using chi-square test of independence.
+    contingency_table = pd.crosstab(labels1, labels2)
+    chi2_stat, p_value, dof, _ = chi2_contingency(contingency_table)
+    return chi2_stat, p_value, dof
+
+
+def run_gene_count_sensitivity(expression, metadata):
+    # Run clustering with different gene counts and perform chi-square tests.
+    gene_counts = [10, 100, 1000, 10000]
+    n_clusters = 2
+
+    clustering_results = {}
+
+    print("Gene Count Sensitivity Analysis")
+
+    for n_genes in gene_counts:
+        gene_variance = expression.var(axis=1)
+        top_genes = gene_variance.nlargest(n_genes).index
+        expr_subset = expression.loc[top_genes]
+
+        X = expr_subset.T.values
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+
+        hc_model = AgglomerativeClustering(n_clusters=n_clusters, linkage="ward")
+        labels = hc_model.fit_predict(X_scaled)
+        sil_score = silhouette_score(X_scaled, labels)
+
+        clustering_results[n_genes] = {"labels": labels, "silhouette": sil_score}
+
+        print(f"\n{n_genes} genes - Silhouette Score: {sil_score:.4f}")
+        print(f"Cluster distribution: {pd.Series(labels).value_counts().to_dict()}")
+
+    # Perform chi-square tests on all pairs
+    chi_square_results = []
+    gene_counts_sorted = sorted(gene_counts)
+
+    print("Chi-Square Test Results (k=2 clusters)")
+
+    for genes1, genes2 in itertools.combinations(gene_counts_sorted, 2):
+        labels1 = clustering_results[genes1]["labels"]
+        labels2 = clustering_results[genes2]["labels"]
+
+        chi2_stat, p_value, dof = chi_square_clustering_comparison(labels1, labels2)
+
+        chi_square_results.append(
+            {
+                "Method 1": f"{genes1} genes",
+                "Method 2": f"{genes2} genes",
+                "Chi-square Statistic": round(chi2_stat, 4),
+                "P-value": round(p_value, 6),
+                "Degrees of Freedom": dof,
+            }
+        )
+
+    results_df = pd.DataFrame(chi_square_results)
+    print("\n" + results_df.to_string(index=False))
+
+    return results_df, clustering_results
 
 
 def main():
@@ -41,13 +105,16 @@ def main():
 
     expression = np.log2(expression + 1)
 
+    # Run gene count sensitivity analysis
+    chi_square_df, _ = run_gene_count_sensitivity(expression, metadata)
+
     gene_variance = expression.var(axis=1)
     top_genes = gene_variance.nlargest(gene_count).index
     expression = expression.loc[top_genes]
 
     X = expression.T.values
 
-    print("K-means input shape:", X.shape)
+    print("\n\nK-means input shape:", X.shape)
 
     Path("figs").mkdir(exist_ok=True)
 
