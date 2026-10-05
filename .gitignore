@@ -11,3 +11,9 @@ venv
 SRP092402
 Assignment-2/mart_export.txt
 Assignment-2/mart_export.txt
+
+# Document locks
+*.~lock.*
+
+# Data zip file
+b827cab9-b892-4f34-8144-0b98e28676df.zip
