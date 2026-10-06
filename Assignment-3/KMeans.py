@@ -1,10 +1,10 @@
 import reader
 import numpy as np
-import matplotlib.pyplot as plt
-from pathlib import Path
+import pandas as pd
 
 from sklearn.cluster import KMeans
-from sklearn.decomposition import PCA
+from statsmodels.stats.multitest import multipletests
+from scipy.stats import chi2_contingency
 
 
 def main():
@@ -24,58 +24,43 @@ def main():
     expression = np.log2(expression + 1)
 
     gene_variance = expression.var(axis=1)
-    top_genes = gene_variance.nlargest(5000).index
-    expression = expression.loc[top_genes]
 
-    X = expression.T.values
+    k = 2
 
-    print("K-means input shape:", X.shape)
+    gene_counts = [10, 100, 1000, 10000]
 
-    Path("figs").mkdir(exist_ok=True)
+    results = []
+    for n_genes in gene_counts:
 
-    # ONLY for visualization.
-    pca = PCA(n_components=2)
-    X_plot = pca.fit_transform(X)
+        top_genes = gene_variance.nlargest(n_genes).index
+        expression_subset = expression.loc[top_genes]
 
-    for k in [2, 3, 4, 5]:
+        X = expression_subset.T.values
 
         model = KMeans(n_clusters=k, random_state=42, n_init=20)
 
         clusters = model.fit_predict(X)
 
-        print(f"\nk = {k}")
-        print("Cluster counts:")
+        contingency_table = pd.crosstab(metadata["refinebio_disease"], clusters)
 
-        unique, counts = np.unique(clusters, return_counts=True)
+        chi2, p_value, dof, expected = chi2_contingency(contingency_table)
+        results.append((n_genes, chi2, p_value))
 
-        for cluster, count in zip(unique, counts):
-            print(f"Cluster {cluster}: {count} samples")
+    p_values = [result[2] for result in results]
 
-        plt.figure(figsize=(8, 6))
+    adjusted_p_values = multipletests(p_values, method="fdr_bh")[1]
 
-        for cluster in range(k):
+    print("\nK-MEANS RESULTS")
+    print("k = 2\n")
 
-            mask = clusters == cluster
+    for result, adjusted_p in zip(results, adjusted_p_values):
+        n_genes, chi2, p_value = result
 
-            plt.scatter(
-                X_plot[mask, 0],
-                X_plot[mask, 1],
-                label=f"Cluster {cluster}",
-                alpha=0.7,
-                s=25,
-            )
-
-        plt.xlabel(f"PC1 ({pca.explained_variance_ratio_[0] * 100:.1f}% variance)")
-
-        plt.ylabel(f"PC2 ({pca.explained_variance_ratio_[1] * 100:.1f}% variance)")
-
-        plt.title(f"K-means Clusters Using 5,000 Most Variable Genes (k={k})")
-
-        plt.legend()
-
-        plt.tight_layout()
-        plt.savefig(f"figs/kmeans_k{k}.png", dpi=300)
-        plt.close()
+        print(f"Genes: {n_genes}")
+        print(f"Chi-Squared: {chi2}")
+        print(f"P-Value: {p_value}")
+        print(f"Adjusted P-Value: {adjusted_p}")
+        print()
 
 
 if __name__ == "__main__":
