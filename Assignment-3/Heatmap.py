@@ -8,6 +8,7 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from scipy.cluster.hierarchy import linkage
 from sklearn.cluster import AgglomerativeClustering
+from sklearn.mixture import GaussianMixture
 
 
 def main():
@@ -47,10 +48,15 @@ def main():
     hc_model = AgglomerativeClustering(n_clusters=k, linkage="ward")
     hc_clusters = hc_model.fit_predict(X_scaled)
 
+    #Gaussian Mixture model clustering
+    gauss_model = GaussianMixture(n_components=k, random_state=42)
+    gauss_clusters = gauss_model.fit_predict(X_scaled)
+
     annotation = pd.DataFrame(
         {
             "K-means": [f"Cluster {x}" for x in kmeans_clusters],
             "Hierarchical": [f"Cluster {x}" for x in hc_clusters],
+            "Gaussian Mixture": [f"Cluster {x}" for x in gauss_clusters],
             "Group": metadata["refinebio_disease"].values,
         },
         index=sample_ids,
@@ -62,6 +68,9 @@ def main():
     hc_palette = sns.color_palette("husl", n_colors=k)
     hc_colors = {f"Cluster {i}": hc_palette[i] for i in range(k)}
 
+    gauss_palette = sns.color_palette("coolwarm", n_colors=k)
+    gauss_colors = {f"Cluster {i}": gauss_palette[i] for i in range(k)}
+
     group_palette = sns.color_palette("Set1", n_colors=len(groups))
     group_colors = {group: group_palette[i] for i, group in enumerate(groups)}
 
@@ -69,12 +78,13 @@ def main():
         {
             "K-means": annotation["K-means"].map(kmeans_colors),
             "Hierarchical": annotation["Hierarchical"].map(hc_colors),
+            "Gaussian Mixture": annotation["Gaussian Mixture"].map(gauss_colors),
             "Group": annotation["Group"].map(group_colors),
         },
         index=sample_ids,
     )
-
-    Path("figs").mkdir(exist_ok=True)
+    out_dir = Path(__file__).resolve().parent/"figs"
+    out_dir.mkdir(exist_ok=True)
 
     heatmap = sns.clustermap(
         expression,
@@ -101,6 +111,10 @@ def main():
         heatmap.ax_col_dendrogram.bar(
             0, 0, color=color, label=f"Hierarchical: {label}", linewidth=0
         )
+    for label, color in gauss_colors.items():
+        heatmap.ax_col_dendrogram.bar(
+            0, 0, color=color, label=f"Gaussian Mixture: {label}", linewidth=0
+        )
 
     for label, color in group_colors.items():
         heatmap.ax_col_dendrogram.bar(
@@ -111,7 +125,7 @@ def main():
         loc="upper center", ncol=4, bbox_to_anchor=(0.5, 1.4)
     )
 
-    plt.savefig("figs/heatmap_5000_genes.png", dpi=300, bbox_inches="tight")
+    plt.savefig(out_dir/"heatmap_5000_genes.png", dpi=300, bbox_inches="tight")
 
     plt.close()
 

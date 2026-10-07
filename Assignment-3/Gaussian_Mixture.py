@@ -37,6 +37,13 @@ def main():
         print("Num in Clusters: ")
         print(pd.Series(clusters).value_counts().sort_index())
 
+        tb_table = pd.crosstab(clusters, meta["refinebio_disease"]).values
+        chi,p_val,temp,temp2 = chi2_contingency(tb_table)
+        print("TB vs Healthy Chi-Squared Tests: ")
+        print(tb_table)
+        print("Chi-Squared Value:", chi)
+        print("P-Value:", p_val)
+
     num_genes = [10, 100, 1000, 10000]
     diff_genes_results = {}
     for num in num_genes:
