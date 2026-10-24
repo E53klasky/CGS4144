@@ -48,7 +48,7 @@ def main():
     hc_model = AgglomerativeClustering(n_clusters=k, linkage="ward")
     hc_clusters = hc_model.fit_predict(X_scaled)
 
-    #Gaussian Mixture model clustering
+    # Gaussian Mixture model clustering
     gauss_model = GaussianMixture(n_components=k, random_state=42)
     gauss_clusters = gauss_model.fit_predict(X_scaled)
 
@@ -83,7 +83,7 @@ def main():
         },
         index=sample_ids,
     )
-    out_dir = Path(__file__).resolve().parent/"figs"
+    out_dir = Path(__file__).resolve().parent / "figs"
     out_dir.mkdir(exist_ok=True)
 
     heatmap = sns.clustermap(
@@ -125,7 +125,7 @@ def main():
         loc="upper center", ncol=4, bbox_to_anchor=(0.5, 1.4)
     )
 
-    plt.savefig(out_dir/"heatmap_5000_genes.png", dpi=300, bbox_inches="tight")
+    plt.savefig(out_dir / "heatmap_5000_genes.png", dpi=300, bbox_inches="tight")
 
     plt.close()
 

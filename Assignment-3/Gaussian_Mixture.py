@@ -38,7 +38,7 @@ def main():
         print(pd.Series(clusters).value_counts().sort_index())
 
         tb_table = pd.crosstab(clusters, meta["refinebio_disease"]).values
-        chi,p_val,temp,temp2 = chi2_contingency(tb_table)
+        chi, p_val, temp, temp2 = chi2_contingency(tb_table)
         print("TB vs Healthy Chi-Squared Tests: ")
         print(tb_table)
         print("Chi-Squared Value:", chi)
