@@ -28,16 +28,23 @@ def main():
     metadata = metadata.loc[sample_ids]
 
     # Logistic regression gene signature
-    coefficients = pd.read_csv("CGS4144/Assignment-4/results/disease_5000_genes.csv")
-
+    coefficients = pd.read_csv("results/disease_5000_genes.csv")
     top_genes = coefficients.head(50)["gene"]
 
-    coefficients_rf = pd.read_csv("CGS4144/Assignment-4/RandForest_5000_genes.csv")
+    # Random Forest
+    coefficients_rf = pd.read_csv("RandForest_5000_genes.csv")
     rf_top = coefficients_rf.head(50)["Gene"]
-    
-    top_genes_combined = pd.Index(top_genes.tolist()+rf_top.tolist()).unique()
 
-    heatmap_data = expression.loc[top_genes]
+    # Naive Bayes
+    coefficients_nb = pd.read_csv("out/nb_disease_5000_genes.csv")
+    nb_top = coefficients_nb.head(50)["gene"]
+
+    top_genes_combined = pd.Index(
+        top_genes.tolist() + rf_top.tolist() + nb_top.tolist()
+    ).unique()
+
+    # heatmap_data = expression.loc[top_genes]
+    heatmap_data = expression.loc[top_genes_combined]
 
     heatmap_data = np.log2(heatmap_data + 1)
 
@@ -93,12 +100,12 @@ def main():
     )
 
     g.fig.suptitle(
-        "Heatmap: TB vs Healthy",
+        "Combined Method Heatmap: TB vs Healthy",
         y=1.02,
     )
 
     g.savefig(
-        "CGS4144/Assignment-4/heatmap.png",
+        "heatmap.png",
         dpi=300,
         bbox_inches="tight",
     )
