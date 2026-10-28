@@ -54,17 +54,17 @@ print("")
 
 genes_var = x_train.var().nlargest(5000).index
 x=x_axis[genes_var]
-scaledX=StandardScaler().fit_transform(x_axis[genes_var])
+scaledX=StandardScaler().fit_transform(x)
 
-gauss_model = GaussianMixture(n_components=3, random_state=42)
+gauss_model = GaussianMixture(n_components=2, random_state=42)
 clusters = gauss_model.fit_predict(scaledX)
-x_gtrain, x_gtest, y_gtrain, y_gtest = train_test_split(scaledX, clusters, test_size=0.2, random_state=42)
+x_gtrain, x_gtest, y_gtrain, y_gtest = train_test_split(x, clusters, test_size=0.2, random_state=42)
 rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
 rf_model.fit(x_gtrain, y_gtrain)
 predict_rf_clus = rf_model.predict(x_gtest)
 
 print("Accuracy - Clusters: ", accuracy_score(y_gtest, predict_rf_clus))
 
-#0 = Cluster 0, 1 = Cluster 1, 2 = Cluster 2
-results_clus = pd.DataFrame({"Sample": x_axis.index, "Predicted Cluster": clusters})
+#0 = Cluster 0, 1 = Cluster 1
+results_clus = pd.DataFrame({"Sample": x_gtest.index, "Predicted Cluster": predict_rf_clus})
 results_clus.to_csv("CGS4144/Assignment-4/RandomForest_Predicted_Clusters.csv", index=False)
