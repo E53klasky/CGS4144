@@ -12,6 +12,7 @@ from sklearn.preprocessing import StandardScaler
 
 import reader
 
+
 expr,meta = reader.load_data("../SRP092402")
 meta = meta[
     meta["refinebio_disease"].isin(["tb subjects", "healthy controls"])
@@ -31,7 +32,10 @@ for i in range(len(diff_gene_nums)):
     test=x_test[genes_var]
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(train, y_train)
-
+    if diff_gene_nums[i] == 5000:
+        rf_genes = pd.DataFrame({"Gene": genes_var, "Importance": model.feature_importances_})
+        rf_genes = rf_genes.sort_values(by="Importance", ascending=False)
+        rf_genes.to_csv("CGS4144/Assignment-4/RandForest_5000_genes.csv", index=False)
     print("Number of Genes:", diff_gene_nums[i])
     predict = model.predict(test)
 
