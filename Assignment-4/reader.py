@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import mygene
 import numpy as np
 import pandas as pd
 
@@ -38,6 +37,8 @@ def load_data(data_dir="../SRP092402"):
 
 
 def convert_ensembl_to_gene_names(expression):
+
+    import mygene
 
     mg = mygene.MyGeneInfo()
 

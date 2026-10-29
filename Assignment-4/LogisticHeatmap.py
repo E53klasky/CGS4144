@@ -1,12 +1,10 @@
 import os
-import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 
-sys.path.insert(0, "../Assignment-3")
 import reader
 
 
@@ -28,16 +26,22 @@ def main():
     metadata = metadata.loc[sample_ids]
 
     # Logistic regression gene signature
-    coefficients = pd.read_csv("CGS4144/Assignment-4/results/disease_5000_genes.csv")
+    coefficients = pd.read_csv("results/disease_5000_genes.csv")
 
     top_genes = coefficients.head(50)["gene"]
 
-    coefficients_rf = pd.read_csv("CGS4144/Assignment-4/RandForest_5000_genes.csv")
+    coefficients_rf = pd.read_csv("RandForest_5000_genes.csv")
     rf_top = coefficients_rf.head(50)["Gene"]
-    
-    top_genes_combined = pd.Index(top_genes.tolist()+rf_top.tolist()).unique()
 
-    heatmap_data = expression.loc[top_genes]
+    nb_top = pd.read_csv("out/nb_disease_5000_genes.csv").head(50)["gene"]
+    top_genes_combined = pd.Index(
+        top_genes.tolist() + rf_top.tolist() + nb_top.tolist()
+    ).unique()
+    pd.DataFrame({"gene": top_genes_combined}).to_csv(
+        "out/heatmap_signature_genes.csv", index=False
+    )
+
+    heatmap_data = expression.loc[top_genes_combined]
 
     heatmap_data = np.log2(heatmap_data + 1)
 
@@ -72,12 +76,13 @@ def main():
         center=0,
         xticklabels=False,
         yticklabels=True,
-        figsize=(16, 12),
+        figsize=(16, max(12, len(top_genes_combined) * 0.17)),
         cbar_kws={"label": "Gene expression (Z-score)"},
     )
 
     g.ax_heatmap.set_xlabel("Samples")
     g.ax_heatmap.set_ylabel("Genes")
+    g.ax_heatmap.tick_params(axis="y", labelsize=7)
 
     from matplotlib.patches import Patch
 
@@ -98,7 +103,7 @@ def main():
     )
 
     g.savefig(
-        "CGS4144/Assignment-4/heatmap.png",
+        "heatmap.png",
         dpi=300,
         bbox_inches="tight",
     )

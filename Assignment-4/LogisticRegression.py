@@ -3,9 +3,6 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import sys
-
-sys.path.insert(0, "../Assignment-3")
 import reader
 
 from sklearn.cluster import KMeans
@@ -128,7 +125,7 @@ def train_model(expression, labels, n_genes, name, train_ids, test_ids):
     )
 
     prediction_results.to_csv(
-        f"out/{name}_{n_genes}_predictions.csv",
+        f"results/{name}_{n_genes}_predictions.csv",
         index=False,
     )
 
@@ -147,7 +144,7 @@ def train_model(expression, labels, n_genes, name, train_ids, test_ids):
     )
 
     coefficients.to_csv(
-        f"out/{name}_{n_genes}_genes.csv",
+        f"results/{name}_{n_genes}_genes.csv",
         index=False,
     )
 
@@ -159,7 +156,7 @@ def train_model(expression, labels, n_genes, name, train_ids, test_ids):
     plt.title(f"{name} Logistic Regression ({n_genes} genes)")
     plt.tight_layout()
     plt.savefig(
-        f"out/{name}_{n_genes}_roc.png",
+        f"results/{name}_{n_genes}_roc.png",
         dpi=300,
     )
     plt.close()
@@ -180,7 +177,7 @@ def train_model(expression, labels, n_genes, name, train_ids, test_ids):
     plt.title(f"{name} ({n_genes} genes)")
     plt.tight_layout()
     plt.savefig(
-        f"out/{name}_{n_genes}_confusion.png",
+        f"results/{name}_{n_genes}_confusion.png",
         dpi=300,
     )
     plt.close()
@@ -195,7 +192,7 @@ def train_model(expression, labels, n_genes, name, train_ids, test_ids):
 
 def main():
 
-    os.makedirs("out", exist_ok=True)
+    os.makedirs("results", exist_ok=True)
 
     expression, metadata, disease_labels = prepare_data()
 
@@ -208,7 +205,7 @@ def main():
         stratify=disease_labels,
     )
     pd.DataFrame({"sample": test_ids}).to_csv(
-        "out/test_sample_ids.csv",
+        "results/test_sample_ids.csv",
         index=False,
     )
 
@@ -222,7 +219,7 @@ def main():
     )
 
     sample_labels.to_csv(
-        "out/sample_labels.csv",
+        "results/sample_labels.csv",
         index=False,
     )
 
@@ -260,14 +257,14 @@ def main():
         )
     results = pd.DataFrame(results)
 
-    disease = pd.read_csv("out/disease_5000_predictions.csv")
-    cluster = pd.read_csv("out/cluster_5000_predictions.csv")
+    disease = pd.read_csv("results/disease_5000_predictions.csv")
+    cluster = pd.read_csv("results/cluster_5000_predictions.csv")
 
     assert set(disease["sample"]) == set(cluster["sample"])
 
     print("Disease and cluster test samples match!")
     results.to_csv(
-        "out/model_summary.csv",
+        "results/model_summary.csv",
         index=False,
     )
 

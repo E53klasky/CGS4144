@@ -1,4 +1,5 @@
 import os
+import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -46,8 +47,8 @@ def prepare_data():
     return expression, labels
 
 
-def load_clusters(expression):
-    sample_labels = pd.read_csv(LABELS_FILE).set_index("sample")
+def load_clusters(expression, labels_file):
+    sample_labels = pd.read_csv(labels_file).set_index("sample")
 
     clusters = sample_labels.loc[expression.columns, "cluster"]
 
@@ -168,9 +169,33 @@ def train_model(expression, labels, n_genes, name, train_ids, test_ids):
 def main():
     os.makedirs("out", exist_ok=True)
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--cluster-labels",
+        help="Amit's Assignment 3 labels CSV with sample and cluster columns",
+    )
+    args = parser.parse_args()
     expression, disease_labels = prepare_data()
 
-    clusters = load_clusters(expression)
+    if args.cluster_labels:
+        clusters = load_clusters(expression, args.cluster_labels)
+    else:
+        # Reproduce Amit's Assignment 3 Ward clustering, choosing k=2 for
+        # binary classification. Do not reuse Ethan's K-means labels.
+        from sklearn.cluster import AgglomerativeClustering
+        from sklearn.preprocessing import StandardScaler
+
+        genes = expression.var(axis=1).nlargest(5000).index
+        scaled = StandardScaler().fit_transform(expression.loc[genes].T)
+        clusters = pd.Series(
+            AgglomerativeClustering(n_clusters=2, linkage="ward").fit_predict(scaled),
+            index=expression.columns,
+        )
+    if set(clusters.unique()) != {0, 1}:
+        raise ValueError("This script requires binary cluster labels encoded 0 and 1")
+    pd.DataFrame({"sample": clusters.index, "cluster": clusters.values}).to_csv(
+        "out/nb_sample_clusters.csv", index=False
+    )
 
     test_ids = pd.read_csv(TEST_IDS_FILE)["sample"].tolist()
     test_set = set(test_ids)
