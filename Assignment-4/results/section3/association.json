@@ -1,0 +1,23 @@
+{
+  "samples": 164,
+  "spearman_rho": -0.17622754490596704,
+  "spearman_p": 0.03757313785668757,
+  "spearman_p_method": "exact permutation distribution of absolute rho",
+  "spearman_asymptotic_p_reference_only": 0.023992606261305994,
+  "spearman_BH_q": 0.03757313785668757,
+  "fisher_odds_ratio": 0.25824175824175827,
+  "fisher_p": 0.023354940067773035,
+  "fisher_BH_q": 0.03757313785668757,
+  "disease_unanimous": 122,
+  "cluster_unanimous": 133,
+  "cluster_mappings": {
+    "RF": {
+      "0": 0,
+      "1": 1
+    },
+    "NB": {
+      "1": 0,
+      "0": 1
+    }
+  }
+}

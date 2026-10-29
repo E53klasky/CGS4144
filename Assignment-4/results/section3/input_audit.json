@@ -1,0 +1,45 @@
+{
+  "LR_disease": {
+    "file": "results/disease_5000_predictions.csv",
+    "samples": 164,
+    "predicted_0": 23,
+    "predicted_1": 141,
+    "shared_test_overlap": 164
+  },
+  "LR_cluster": {
+    "file": "results/cluster_5000_predictions.csv",
+    "samples": 164,
+    "predicted_0": 82,
+    "predicted_1": 82,
+    "shared_test_overlap": 164
+  },
+  "RF_disease": {
+    "file": "RandForest_Predictions_5000_Genes.csv",
+    "samples": 164,
+    "predicted_0": 4,
+    "predicted_1": 160,
+    "shared_test_overlap": 164
+  },
+  "RF_cluster": {
+    "file": "RandomForest_Predicted_Clusters.csv",
+    "samples": 164,
+    "predicted_0": 67,
+    "predicted_1": 97,
+    "shared_test_overlap": 164
+  },
+  "NB_disease": {
+    "file": "out/nb_disease_5000_predictions.csv",
+    "samples": 164,
+    "predicted_0": 40,
+    "predicted_1": 124,
+    "shared_test_overlap": 164
+  },
+  "NB_cluster": {
+    "file": "out/nb_cluster_5000_predictions.csv",
+    "samples": 164,
+    "predicted_0": 102,
+    "predicted_1": 62,
+    "shared_test_overlap": 164
+  },
+  "problems": []
+}
